@@ -11,12 +11,13 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Symfony\Component\Finder\Finder;
 
 // ここを都度修正
-$basedir = dirname(dirname(__FILE__)). '/donyu/20221206-111811/';
+$basedir = dirname(dirname(__FILE__)). '/basic-codey/20221216-184214/';
 $orgdir= $basedir .'posts'; //wordpressから吐き出されたファイルからMDに変換した状態
-$outputdir = $basedir .'doku';  //一箇所に平面的にtxt化させた状態
+$outputdir = $basedir .'dist';  //一箇所に平面的にtxt化させたものを置く場所（予めフォルダを作成）
 // ここまで
 
 function getMDList($dir) {
+
     $finder = new Finder();
     $iterator = $finder
         ->in($dir) // ディレクトリを指定
@@ -34,13 +35,23 @@ function getSpecificLineFromFile($filename, $lineNum=1) {
   $fp = fopen($filename, 'r');
   $targetLine = fgets($fp);
   fclose($fp);
+  $targetLine = trim($targetLine);
   return trim($targetLine, "# ");
 }
 function mysort($array, $sortkey){
-  foreach($array as $key=>$value){
-    $id[$key] = $value[$sortkey];
+    foreach($array as $key=>$value){
+        preg_match('/(.*)第(\d+)回(.*)/u', $value[$sortkey], $m);
+        if (isset($m[2])){
+            $id[$key] = $m[2];
+        }else{
+            $id[$key] = 100;
+        }
+        //preg_match('/(.*)第(\d+)回(.*)/u', 'あいうえお第2回ddddd', $m);
+        //$m[0] = あいうえお第2回ddddd
+        //$m[1] = あいうえお
+        //$m[2] = 2
+    //$id[$key] = $value[$sortkey];
   }
-  var_dump($id);
   array_multisort($id, SORT_ASC, $array);
   return $array;
 }
